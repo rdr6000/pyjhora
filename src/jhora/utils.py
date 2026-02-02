@@ -27,7 +27,7 @@ import warnings
 import geocoder
 import requests
 from pytz import timezone, utc
-from timezonefinder import TimezoneFinder
+from tzfpy import get_tz as _tzfpy_get_tz
 import csv
 import numpy as np
 import swisseph as swe
@@ -312,9 +312,10 @@ def get_place_timezone_offset(latitude, longitude):
         @return [city,latitude,longitude,time_zone_offset]
     """
     try:
-        tf = TimezoneFinder()
+        # Use tzfpy instead of TimezoneFinder
+        tz_name = _tzfpy_get_tz(longitude, latitude)  # tzfpy uses (lng, lat) order
         today = datetime.datetime.now()
-        tz_target = timezone(tf.timezone_at(lng=longitude, lat=latitude))
+        tz_target = timezone(tz_name)
         # ATTENTION: tz_target could be None! handle error case
         today_target = tz_target.localize(today)
         today_utc = utc.localize(today)
